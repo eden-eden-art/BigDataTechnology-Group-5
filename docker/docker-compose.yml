@@ -1,0 +1,124 @@
+version: "3"
+
+services:
+  namenode:
+    image: bde2020/hadoop-namenode
+    container_name: namenode
+    restart: always
+    ulimits:
+        nofile:
+            soft: 65536
+            hard: 65536
+    ports:
+      - 9870:9870
+      - 9000:9000
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+    env_file:
+      - ./hadoop.env
+
+  datanode:
+    image: bde2020/hadoop-datanode
+    container_name: datanode
+    restart: always
+    ulimits:
+        nofile:
+            soft: 65536
+            hard: 65536
+    volumes:
+      - hadoop_datanode:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
+  
+  resourcemanager:
+    image: bde2020/hadoop-resourcemanager
+    container_name: resourcemanager
+    restart: always
+    ulimits:
+        nofile:
+            soft: 65536
+            hard: 65536
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864"
+    env_file:
+      - ./hadoop.env
+
+  nodemanager1:
+    image: bde2020/hadoop-nodemanager
+    container_name: nodemanager
+    restart: always
+    ulimits:
+        nofile:
+            soft: 65536
+            hard: 65536
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+  
+  historyserver:
+    image: bde2020/hadoop-historyserver
+    container_name: historyserver
+    restart: always
+    ulimits:
+        nofile:
+            soft: 65536
+            hard: 65536
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+    volumes:
+      - hadoop_historyserver:/hadoop/yarn/timeline
+    env_file:
+      - ./hadoop.env
+
+  spark-master:
+    image: bde2020/spark-master
+    container_name: spark-master
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    environment:
+      - INIT_DAEMON_STEP=setup_spark
+  spark-worker-1:
+    image: bde2020/spark-worker
+    container_name: spark-worker-1
+    depends_on:
+      - spark-master
+    ports:
+      - "8081:8081"
+    environment:
+      - "SPARK_MASTER=spark://spark-master:7077"
+  spark-worker-2:
+    image: bde2020/spark-worker
+    container_name: spark-worker-2
+    depends_on:
+      - spark-master
+    ports:
+      - "8082:8081"
+    environment:
+      - "SPARK_MASTER=spark://spark-master:7077"
+  spark-history-server:
+      image: bde2020/spark-history-server
+      container_name: spark-history-server
+      depends_on:
+        - spark-master
+      ports:
+        - "18081:18081"
+      volumes:
+        - /tmp/spark-events-local:/tmp/spark-events
+  
+  hue:
+    image: bde2020/hdfs-filebrowser
+    ports:
+      - 8088:8088
+    environment:
+      - NAMENODE_HOST=namenode
+
+volumes:
+  hadoop_namenode:
+  hadoop_datanode:
+  hadoop_historyserver:
