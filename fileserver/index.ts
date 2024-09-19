@@ -11,6 +11,11 @@ app.use(express.json());
 fs.mkdir("data/")
     .catch(err => { });
 
+const die = () => { console.log("killing myself"); process.exit(0); };
+process.on("SIGINT", die);
+process.on("SIGTERM", die);
+process.on("SIGKILL", die);
+
 app.post("/", (req, res) => {
     const { file, content } = req.body;
     console.log(`saving file: [${file}] - [${content}]`);
@@ -27,9 +32,9 @@ app.get("/", (req, res) => {
 app.get("/download", async (req, res) => {
     console.log(`zipping files`);
 
-    zip.sync.zip("./data").compress().save("./alldata.zip")
+    zip.sync.zip("./data").compress().save("./alldata.zip");
 
-    res.sendFile(`${__dirname}/alldata.zip`)
+    res.sendFile(`${__dirname}/alldata.zip`);
 });
 
 app.listen(3000, () => {
