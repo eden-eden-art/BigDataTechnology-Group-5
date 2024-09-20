@@ -75,6 +75,9 @@ services:
     env_file:
       - ./hadoop.env
 
+
+
+
   spark-master:
     image: bde2020/spark-master
     container_name: spark-master
@@ -83,6 +86,7 @@ services:
       - "7077:7077"
     environment:
       - INIT_DAEMON_STEP=setup_spark
+
   spark-worker-1:
     image: bde2020/spark-worker
     container_name: spark-worker-1
@@ -92,6 +96,7 @@ services:
       - "8081:8081"
     environment:
       - "SPARK_MASTER=spark://spark-master:7077"
+
   spark-worker-2:
     image: bde2020/spark-worker
     container_name: spark-worker-2
@@ -101,6 +106,7 @@ services:
       - "8082:8081"
     environment:
       - "SPARK_MASTER=spark://spark-master:7077"
+
   spark-history-server:
       image: bde2020/spark-history-server
       container_name: spark-history-server
@@ -109,7 +115,7 @@ services:
       ports:
         - "18081:18081"
       volumes:
-        - /tmp/spark-events-local:/tmp/spark-events
+        - /tmp/spark-events-local:/tmp/spark-events 
   
   hue:
     image: bde2020/hdfs-filebrowser
