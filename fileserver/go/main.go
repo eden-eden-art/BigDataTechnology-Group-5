@@ -45,7 +45,7 @@ func main() {
 
 		var fileNames string
 		for _, file := range files {
-			fileNames += file.Name()
+			fileNames += file.Name() + "<br />"
 		}
 
 		os.WriteFile("out/list.html", []byte(fileNames), os.ModePerm)
