@@ -114,13 +114,21 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 		if n == 0 {
 			break
 		}
+		// Send the chunk size
+		fmt.Fprintf(w, "%x\r\n", n)
+		// Send the chunk
 		_, err = w.Write(buf[:n])
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		// Send a newline to mark the end of the chunk
+		fmt.Fprint(w, "\r\n")
 		w.(http.Flusher).Flush()
 	}
+	// Send a final chunk size of 0 to mark the end of the response
+	fmt.Fprint(w, "0\r\n\r\n")
+	w.(http.Flusher).Flush()
 }
 
 func zipData() {
