@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 )
 
@@ -38,6 +37,22 @@ func main() {
 		}
 	}()
 
+	go func() {
+		files, err := os.ReadDir("./data")
+		if err != nil {
+			return
+		}
+
+		var fileNames string
+		for _, file := range files {
+			fileNames += file.Name()
+		}
+
+		os.WriteFile("out/list.html", []byte(fileNames), os.ModePerm)
+
+		time.Sleep(10 * time.Second)
+	}()
+
 	http.HandleFunc("/", handleRoot)
 	http.HandleFunc("/download", handleDownload)
 
@@ -48,19 +63,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		fmt.Println("serving /")
 
-		files, err := os.ReadDir("./data")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		var fileNames []string
-		for _, file := range files {
-			fileNames = append(fileNames, file.Name())
-		}
-
-		w.Header().Set("Content-Type", "text/plain")
-		fmt.Fprint(w, strings.Join(fileNames, "\n"))
+		http.ServeFile(w, r, "./out/list.html")
 	}
 
 	if r.Method == "POST" {
