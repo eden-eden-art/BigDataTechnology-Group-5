@@ -89,17 +89,32 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDownload(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, "Invalid request method", http.StatusBadRequest)
+	// if r.Method != "GET" {
+	// 	http.Error(w, "Invalid request method", http.StatusBadRequest)
+	// 	return
+	// }
+
+	// fmt.Println("serving dump")
+
+	// w.Header().Set("Content-Disposition", "attachment; filename=\"alldata.zip\"")
+	// w.Header().Set("Content-Type", "application/zip")
+
+	// http.ServeFile(w, r, "./out/alldata.zip")
+
+	file, err := os.Open("./out/alldata.zip")
+	if err != nil {
+		http.Error(w, "File not found", http.StatusNotFound)
+		return
+	}
+	defer file.Close()
+
+	fileInfo, err := file.Stat()
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Println("serving dump")
-
-	w.Header().Set("Content-Disposition", "attachment; filename=\"alldata.zip\"")
-	w.Header().Set("Content-Type", "application/zip")
-
-	http.ServeFile(w, r, "./out/alldata.zip")
+	http.ServeContent(w, r, fileInfo.Name(), fileInfo.ModTime(), file)
 }
 
 func zipData() {
