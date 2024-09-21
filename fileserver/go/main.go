@@ -95,40 +95,8 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Disposition", "attachment; filename=\"alldata.zip\"")
 	w.Header().Set("Content-Type", "application/zip")
-	w.Header().Set("Transfer-Encoding", "chunked")
 
-	file, err := os.Open("./out/alldata.zip")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer file.Close()
-
-	buf := make([]byte, 32*1024)
-	for {
-		n, err := file.Read(buf)
-		if err != nil && err != io.EOF {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if n == 0 {
-			break
-		}
-		// Send the chunk size
-		fmt.Fprintf(w, "%x\r\n", n)
-		// Send the chunk
-		_, err = w.Write(buf[:n])
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		// Send a newline to mark the end of the chunk
-		fmt.Fprint(w, "\r\n")
-		w.(http.Flusher).Flush()
-	}
-	// Send a final chunk size of 0 to mark the end of the response
-	fmt.Fprint(w, "0\r\n\r\n")
-	w.(http.Flusher).Flush()
+	http.ServeFile(w, r, "./out/alldata.zip")
 }
 
 func zipData() {
