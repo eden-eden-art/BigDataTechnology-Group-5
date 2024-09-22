@@ -4,7 +4,7 @@
 #Import necessary libraries
 import matplotlib.pyplot as plt
 
-# Ensure inline plotting in Zeppelin
+# Enable displaying results right below executed paragraph
 %matplotlib inline
 
 # Sample data (replace this with your actual data from SparkSQL)

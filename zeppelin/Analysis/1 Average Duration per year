@@ -1,7 +1,8 @@
 # 1) Average Song Duration per year
-# Method: TrendLine
+# Display-Method: Trend-Line
 
 %python
+# Enable displaying results right below executed paragraph
 %matplotlib inline
 
 # Import necessary libraries
@@ -26,7 +27,7 @@ data = [
 years = [row[0] for row in data]
 durations = [row[1] for row in data]
 
-# Create the plot
+# Create the plot (the diagram)
 plt.figure(figsize=(10, 6))
 plt.plot(years, durations, marker='o')
 plt.title('Average Song Duration by Year')
@@ -34,5 +35,5 @@ plt.xlabel('Year')
 plt.ylabel('Average Duration (seconds)')
 plt.grid(True)
 
-# Show the plot
+# Show the plot (Zeppelin will automatically render it)
 plt.show()
