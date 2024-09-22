@@ -1,0 +1,36 @@
+# 4) Top 10 most occuring artists
+# Method: BarChart
+
+# Import necessary libraries
+import matplotlib.pyplot as plt
+
+# Ensure inline plotting in Zeppelin
+%matplotlib inline
+
+# Example input data (replace this with your actual data)
+top_artists = [
+    ('The Beatles', 150), ('Elvis Presley', 120), ('Michael Jackson', 110),
+    ('Madonna', 100), ('Elton John', 95), ('Led Zeppelin', 90),
+    ('Pink Floyd', 85), ('The Rolling Stones', 80), ('Queen', 75),
+    ('David Bowie', 70)
+]
+
+# Separate the artists and their counts
+artists, counts = zip(*top_artists)
+
+# Create a bar chart
+plt.figure(figsize=(10, 6))
+bars = plt.barh(artists, counts, color='lightcoral')  # Horizontal bar chart
+
+# Add the count labels to each bar
+for bar, count in zip(bars, counts):
+    plt.text(bar.get_width() + 1, bar.get_y() + bar.get_height()/2,  # Position of the text
+             str(count), va='center', color='black')  # Text label and formatting
+
+plt.title('Top 10 Most Frequent Artists')
+plt.xlabel('Count')
+plt.ylabel('Artists')
+plt.grid(axis='x')
+
+# Show the plot
+plt.show()

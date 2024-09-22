@@ -1,0 +1,29 @@
+# 3) Top10 words in all song titles
+# Method: BarChart
+
+# Import necessary libraries
+import matplotlib.pyplot as plt
+
+# Ensure inline plotting in Zeppelin
+%matplotlib inline
+
+# Example input data (replace this with your actual data)
+top_words = [
+    ('love', 45), ('you', 40), ('me', 35), ('the', 30), 
+    ('i', 28), ('to', 25), ('your', 22), ('my', 20), 
+    ('all', 18), ('be', 15)
+]
+
+# Separate the words and their counts
+words, counts = zip(*top_words)
+
+# Create a bar chart
+plt.figure(figsize=(10, 6))
+plt.barh(words, counts, color='lightblue')  # Horizontal bar chart for readability
+plt.title('Top 10 Most Frequent Words in Song Titles')
+plt.xlabel('Count')
+plt.ylabel('Words')
+plt.grid(axis='x')
+
+# Show the plot
+plt.show()
