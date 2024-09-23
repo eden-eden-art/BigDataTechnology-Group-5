@@ -8,7 +8,7 @@ spark = SparkSession\
     .appName("kafka_eater")\
     .getOrCreate()
 
-kafka_topic = "games"
+kafka_topic = "songs" # use for collection name
 kafka_bootstrap_servers = "kafka:9093"
 
 df = spark \
@@ -23,24 +23,8 @@ df = spark \
   .option("forceDeleteTempCheckpointLocation", "true") \
   .option("spark.mongodb.connection.uri", 'mongodb://mongo:27017/') \
   .option("spark.mongodb.database", 'data') \
-  .option("spark.mongodb.collection", 'games') \
+  .option("spark.mongodb.collection", kafka_topic) \
   .outputMode("append")
 
 query = df.start().awaitTermination()
 
-# client = MongoClient('mongodb://mongo:27017/')
-# db = client['data']
-# games_collection = db['games']
-
-# if 'games' not in db.list_collection_names():
-#     games_collection = db.create_collection('games')
-
-# consumer = KafkaConsumer("games", bootstrap_servers='kafka:9093', auto_offset_reset='earliest')
-
-# for msg in consumer:
-#     record = json.loads(msg.value)
-#     games_collection.insert_one(record)
-
-# client.close()
-
-# spark.close()

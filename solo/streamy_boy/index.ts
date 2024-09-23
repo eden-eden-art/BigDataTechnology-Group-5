@@ -27,18 +27,34 @@ producer.connect().then(() => {
     // let time = 1000
     // tokens.forEach(token => {
     //     console.log(`Calling for ${token}`);
-        
+
     //     setTimeout(() => oneBatch(token), time)
     //     time + 30000
     // });
 
-    oneBatch("a")
+    for (let i = 0; i < 100; i++) {
+        const data = {
+            "year": 2014,
+            "name": "Minecraft",
+            "artists": "C418",
+            "duration": 254000
+        };
+
+        producer.send({
+            topic: 'songs',
+            messages: [
+                { value: JSON.stringify(data) }
+            ]
+        });
+    }
 });
 
 
 const oneBatch = (token: string, limit?: number) => {
     console.log(token);
-    fetch(`https://www.cheapshark.com/api/1.0/games?title=${token}&limit=${limit ?? 5}`, requestOptions)
+    if (!limit) limit = 5;
+
+    fetch(`https://www.cheapshark.com/api/1.0/games?title=${token}&limit=${limit}`, requestOptions)
         .then(response => response.json())
         .then((result: Game[]) => {
             result.forEach((game: Game) => {
@@ -58,7 +74,7 @@ const oneBatch = (token: string, limit?: number) => {
                         console.log(`sending ${push.name}`);
 
                         producer.send({
-                            topic: 'games',
+                            topic: 'songs',
                             messages: [
                                 { value: JSON.stringify(push) }
                             ]
