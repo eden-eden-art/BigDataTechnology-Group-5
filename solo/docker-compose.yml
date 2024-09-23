@@ -1,0 +1,247 @@
+
+
+services:
+  # KAFKA
+  kafka:
+    image: apache/kafka-native
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_LISTENERS: CONTROLLER://localhost:9091,HOST://0.0.0.0:9092,DOCKER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9092,DOCKER://kafka:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,DOCKER:PLAINTEXT,HOST:PLAINTEXT
+
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9091
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LOG_RETENTION_HOURS: 6
+
+  # HADOOP
+  namenode:
+    image: bde2020/hadoop-namenode
+    container_name: namenode
+    restart: always
+    ulimits:
+        nofile:
+            soft: 65536
+            hard: 65536
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+      - "50070:50070"
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+    env_file:
+      - ./hadoop.env
+      - ./hadoop-hive.env
+
+  datanode:
+    image: bde2020/hadoop-datanode
+    container_name: datanode
+    restart: always
+    ulimits:
+        nofile:
+            soft: 65536
+            hard: 65536
+    volumes:
+      - hadoop_datanode:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    ports:
+      - "50075:50075"
+      - "9864:9864"
+    env_file:
+      - ./hadoop.env
+      - ./hadoop-hive.env
+
+  resourcemanager:
+    image: bde2020/hadoop-resourcemanager
+    container_name: resourcemanager
+    restart: always
+    ulimits:
+        nofile:
+            soft: 65536
+            hard: 65536
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 namenode:9000 datanode:9864"
+    env_file:
+      - ./hadoop.env
+
+  nodemanager1:
+    image: bde2020/hadoop-nodemanager
+    container_name: nodemanager
+    restart: always
+    ulimits:
+        nofile:
+            soft: 65536
+            hard: 65536
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode:9864 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+  
+  historyserver:
+    image: bde2020/hadoop-historyserver
+    container_name: historyserver
+    restart: always
+    ulimits:
+        nofile:
+            soft: 65536
+            hard: 65536
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode:9864 resourcemanager:8088"
+    volumes:
+      - hadoop_historyserver:/hadoop/yarn/timeline
+    env_file:
+      - ./hadoop.env
+
+  # SPARK
+  spark-master:
+    image: bde2020/spark-master
+    container_name: spark-master
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    environment:
+      - INIT_DAEMON_STEP=setup_spark
+
+  spark-worker-1:
+    image: bde2020/spark-worker
+    container_name: spark-worker-1
+    depends_on:
+      - spark-master
+    ports:
+      - "8081:8081"
+    environment:
+      - "SPARK_MASTER=spark://spark-master:7077"
+
+  # ENABLE FOR CLUSTER
+  # spark-worker-2:
+  #   image: bde2020/spark-worker
+  #   container_name: spark-worker-2
+  #   depends_on:
+  #     - spark-master
+  #   ports:
+  #     - "8082:8081"
+  #   environment:
+  #     - "SPARK_MASTER=spark://spark-master:7077"
+
+  spark-history-server:
+      image: bde2020/spark-history-server
+      container_name: spark-history-server
+      depends_on:
+        - spark-master
+      ports:
+        - "18081:18081"
+      volumes:
+        - spark-events-local:/tmp/spark-events
+
+  # HBASE
+  # hbase:
+  #   image: bde2020/hbase-standalone:1.0.0-hbase1.2.6
+  #   ulimits:
+  #       nofile:
+  #           soft: 65536
+  #           hard: 65536
+  #   volumes:
+  #     - hbase_data:/hbase-data
+  #     - hbase_zookeeper_data:/zookeeper-data
+  #   ports:
+  #     - "16000:16000"
+  #     - "16010:16010"
+  #     - "16020:16020"
+  #     - "16030:16030"
+  #     - "2888:2888"
+  #     - "3888:3888"
+  #     - "2181:2181"
+  #     - "8086:8080" # REST
+  #   environment:
+  #     SERVICE_PRECONDITION: "namenode:9870 datanode:9864 resourcemanager:8088"
+  #   env_file:
+  #     - ./hbase-standalone.env
+
+  # HIVE
+  hive:
+    image: apache/hive:4.0.0
+    ports:
+      - "10000:10000"
+      - "10002:10002"
+      - "1236:8081"
+    environment:
+      - SERVICE_NAME=hiveserver2
+  
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo:/data/db
+
+  # MONITORS
+  hue:
+    image: gethue/hue
+    ports:
+      - "1235:8888"
+    environment:
+      - NAMENODE_HOST=namenode
+
+  kafka-ui:
+    image: ghcr.io/kafbat/kafka-ui:latest
+    ports:
+      - "1234:8080"
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9093
+    depends_on:
+      - kafka
+
+
+volumes:
+  mongo:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./persistence/mongo
+      o: bind
+  hadoop_namenode:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./persistence/hadoop_namenode
+      o: bind
+  hadoop_datanode:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./persistence/hadoop_datanode
+      o: bind
+  hadoop_historyserver:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./persistence/hadoop_historyserver
+      o: bind
+  hbase_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./persistence/hbase_data
+      o: bind
+  hbase_zookeeper_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./persistence/hbase_zookeeper_data
+      o: bind
+  spark-events-local:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./persistence/spark-events-local
+      o: bind
