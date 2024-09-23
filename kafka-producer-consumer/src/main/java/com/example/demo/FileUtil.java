@@ -50,8 +50,8 @@ public class FileUtil {
     // Extract a key from the file content, for example, the year
     public static String extractKeyFromFile(String filePath) throws IOException {
         // Implement the logic to extract the key (e.g., year) from the file
-        // For this example, let's assume the file name contains the year as YYYY
+        // For this example, the file name contains the year as YYYY
         String fileName = new File(filePath).getName();
-        return fileName.split("_")[0];  // Assuming the file name starts with the year
+        return fileName.split("_")[0];
     }
 }
