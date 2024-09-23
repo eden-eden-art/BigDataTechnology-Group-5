@@ -1,0 +1,14 @@
+{
+  "name": "gotohbase",
+  "module": "index.ts",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "hbase-client": "^1.7.0"
+  }
+}

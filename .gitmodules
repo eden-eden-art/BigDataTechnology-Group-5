@@ -1,0 +1,3 @@
+[submodule "cs523proj"]
+	path = cs523proj
+	url = https://github.com/deveshmittal/cs523proj.git
