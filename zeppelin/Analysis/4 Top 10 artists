@@ -1,36 +1,36 @@
-# 4) Top 10 most occuring artists
+# 4) Top 10 most occurring artists
 # Method: BarChart
 
 # Import necessary libraries
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Ensure inline plotting in Zeppelin
 %matplotlib inline
 
 # Example input data (replace this with your actual data)
 top_artists = [
-    ('The Beatles', 150), ('Elvis Presley', 120), ('Michael Jackson', 110),
-    ('Madonna', 100), ('Elton John', 95), ('Led Zeppelin', 90),
-    ('Pink Floyd', 85), ('The Rolling Stones', 80), ('Queen', 75),
-    ('David Bowie', 70)
+   {"_id":"66f1c35a057f7e3d6ba67d1b","artist":"Elton John","count":208},{"_id":"66f1c35a057f7e3d6ba67d1c","artist":"The Beatles","count":143},{"_id":"66f1c35a057f7e3d6ba67d1d","artist":"C418","count":140},{"_id":"66f1c35a057f7e3d6ba67d1e","artist":"The Manhattan Transfer","count":130},{"_id":"66f1c35a057f7e3d6ba67d1f","artist":"Bette Midler","count":130},{"_id":"66f1c35a057f7e3d6ba67d20","artist":"Days Of The New","count":130},{"_id":"66f1c35a057f7e3d6ba67d21","artist":"Forever The Sickest Kids","count":112}
 ]
 
 # Separate the artists and their counts
-artists, counts = zip(*top_artists)
+artists = [row["artist"] for row in top_artists]
+counts = [row["count"] for row in top_artists]
+
+# Normalize counts for color mapping
+norm_counts = np.array(counts) / max(counts)  # Normalize counts for color intensity
 
 # Create a bar chart
-plt.figure(figsize=(10, 6))
-bars = plt.barh(artists, counts, color='lightcoral')  # Horizontal bar chart
+plt.figure(figsize=(12, 7))
+bars = plt.barh(artists, counts, color=plt.cm.Dark2(norm_counts), edgecolor='none')  # Use colormap for darker shades
 
 # Add the count labels to each bar
 for bar, count in zip(bars, counts):
-    plt.text(bar.get_width() + 1, bar.get_y() + bar.get_height()/2,  # Position of the text
-             str(count), va='center', color='black')  # Text label and formatting
+    plt.text(bar.get_width() + 5, bar.get_y() + bar.get_height()/2,  # Position of the text
+             str(count), va='center', fontsize=12, fontweight='bold', color='darkgreen')  # Taller count label
 
-plt.title('Top 10 Most Frequent Artists')
-plt.xlabel('Count')
-plt.ylabel('Artists')
-plt.grid(axis='x')
-
-# Show the plot
-plt.show()
+# Customize the plot
+plt.title('Top 10 Most Frequent Artists', fontsize=18, fontweight='bold')
+plt.xlabel('Count', fontsize=14)
+plt.ylabel('Artists', fontsize=14)
+plt.xticks(fontsize=12)

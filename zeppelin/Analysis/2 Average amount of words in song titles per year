@@ -1,38 +1,29 @@
-# 2) Average amount of words in song titles per year
-# Method: Area plot
+# 2) Average amount of characters in song titles per year
+# Method: AreaPlot
 
 #Import necessary libraries
 import matplotlib.pyplot as plt
 
-# Enable displaying results right below executed paragraph
+# Ensure inline plotting in Zeppelin
 %matplotlib inline
 
 # Sample data (replace this with your actual data from SparkSQL)
 data = [
-    (1961, 3), (1962, 3.5), (1963, 4), (1964, 4.2), (1965, 3.8),
-    (1966, 4.1), (1967, 3.7), (1968, 4.5), (1969, 4.0), (1970, 4.3),
-    (1971, 4.1), (1972, 4.2), (1973, 4.6), (1974, 4.4), (1975, 4.3),
-    (1976, 4.5), (1977, 4.6), (1978, 4.7), (1979, 4.2), (1980, 4.0),
-    (1981, 4.1), (1982, 3.9), (1983, 4.4), (1984, 4.5), (1985, 4.3),
-    (1986, 4.2), (1987, 4.6), (1988, 4.1), (1989, 4.7), (1990, 4.3),
-    (1991, 4.4), (1992, 4.5), (1993, 4.3), (1994, 4.6), (1995, 4.2),
-    (1996, 4.1), (1997, 4.5), (1998, 4.3), (1999, 4.4), (2000, 4.6),
-    (2001, 4.2), (2002, 4.5), (2003, 4.7), (2004, 4.4), (2005, 4.3),
-    (2006, 4.1), (2007, 4.6), (2008, 4.4), (2009, 4.7), (2010, 4.2),
-    (2011, 4.5), (2012, 4.4), (2013, 4.6), (2014, 4.7)
+    {"_id":"66f1bca61dd7636f27355f5b","year":1967,"average_titlelength":21.1},{"_id":"66f1bca61dd7636f27355f5c","year":1968,"average_titlelength":21.6},{"_id":"66f1bca61dd7636f27355f5d","year":1969,"average_titlelength":16.8},{"_id":"66f1bca61dd7636f27355f5e","year":1970,"average_titlelength":13.9},{"_id":"66f1bca61dd7636f27355f5f","year":1971,"average_titlelength":27.7},{"_id":"66f1bca61dd7636f27355f60","year":1972,"average_titlelength":37.6},{"_id":"66f1bca61dd7636f27355f61","year":1973,"average_titlelength":26.6},{"_id":"66f1bca61dd7636f27355f62","year":1974,"average_titlelength":29}
 ]
 
 # Convert data to lists
-years = [row[0] for row in data]
-avg_words = [row[1] for row in data]
+years = [row["year"] for row in data]
+avg_chars = [row["average_titlelength"] for row in data]
 
 # Area plot visualization
 plt.figure(figsize=(12, 6))
-plt.fill_between(years, avg_words, color='skyblue', alpha=0.5)
-plt.plot(years, avg_words, color='Slateblue', alpha=0.6, linewidth=2)
-plt.title('Average Number of Words in Song Titles by Year (Area Plot)')
+plt.gcf().set_facecolor('#8FC7E7')
+plt.fill_between(years, avg_chars, color='#E45E7F', alpha=0.5)
+plt.plot(years, avg_chars, color='#8A364B', alpha=0.6, linewidth=4)
+plt.title('Average Number of Characters in Song Titles by Year (Area Plot)')
 plt.xlabel('Year')
-plt.ylabel('Average Words')
+plt.ylabel('Average Characters')
 plt.grid(True)
 
 # Show the plot

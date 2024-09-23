@@ -1,29 +1,54 @@
-# 3) Top10 words in all song titles
+# 3) Top 25 words in all song titles
 # Method: BarChart
 
 # Import necessary libraries
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Ensure inline plotting in Zeppelin
 %matplotlib inline
 
 # Example input data (replace this with your actual data)
-top_words = [
-    ('love', 45), ('you', 40), ('me', 35), ('the', 30), 
-    ('i', 28), ('to', 25), ('your', 22), ('my', 20), 
-    ('all', 18), ('be', 15)
+data = [
+    {"_id":"66f1c35a057f7e3d6ba67d07","word":"I","count":340},
+    {"_id":"66f1c35a057f7e3d6ba67d08","word":"of","count":317},
+    {"_id":"66f1c35a057f7e3d6ba67d09","word":"My","count":247},
+    {"_id":"66f1c35a057f7e3d6ba67d0a","word":"In","count":237},
+    {"_id":"66f1c35a057f7e3d6ba67d0b","word":"the","count":221},
+    {"_id":"66f1c35a057f7e3d6ba67d0c","word":"Version","count":220},
+    {"_id":"66f1c35a057f7e3d6ba67d0d","word":"(feat.","count":212},
+    {"_id":"66f1c35a057f7e3d6ba67d0e","word":"A","count":209},
+    {"_id":"66f1c35a057f7e3d6ba67d0f","word":"It","count":197},
+    {"_id":"66f1c35a057f7e3d6ba67d10","word":"Be","count":194},
 ]
 
 # Separate the words and their counts
-words, counts = zip(*top_words)
+words = [row["word"] for row in data]
+counts = [row["count"] for row in data]
+
+# Normalize counts for color mapping
+norm_counts = np.array(counts) / max(counts)  # Normalize counts for color intensity
 
 # Create a bar chart
 plt.figure(figsize=(10, 6))
-plt.barh(words, counts, color='lightblue')  # Horizontal bar chart for readability
-plt.title('Top 10 Most Frequent Words in Song Titles')
-plt.xlabel('Count')
-plt.ylabel('Words')
+bars = plt.barh(words, counts, color=plt.cm.Blues(norm_counts), edgecolor='none')  # Use colormap for darker shades
+
+# Add count labels to each bar
+for bar in bars:
+    plt.text(bar.get_width() + 5, bar.get_y() + bar.get_height()/2,  # Positioning the text
+             f'{bar.get_width()}', 
+             va='center', 
+             fontsize=10, 
+             color='black')
+
+# Customize the plot
+plt.title('Top 25 Most Frequent Words in Song Titles', fontsize=16)
+plt.xlabel('Count', fontsize=14)
+plt.ylabel('Words', fontsize=14)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)  # Increase y-axis text size
 plt.grid(axis='x')
 
 # Show the plot
+plt.tight_layout()  # Adjust layout to prevent clipping
 plt.show()

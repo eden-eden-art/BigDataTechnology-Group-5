@@ -1,7 +1,6 @@
 # 1) Average Song Duration per year
 # Display-Method: Trend-Line
 
-%python
 # Enable displaying results right below executed paragraph
 %matplotlib inline
 
@@ -10,29 +9,19 @@ import matplotlib.pyplot as plt
 
 # Sample data (replace this with your actual data from SparkSQL)
 data = [
-    (1961, 180), (1962, 182), (1963, 185), (1964, 188), (1965, 190),
-    (1966, 192), (1967, 195), (1968, 198), (1969, 200), (1970, 202),
-    (1971, 205), (1972, 208), (1973, 210), (1974, 212), (1975, 215),
-    (1976, 218), (1977, 220), (1978, 223), (1979, 225), (1980, 228),
-    (1981, 230), (1982, 233), (1983, 235), (1984, 238), (1985, 240),
-    (1986, 243), (1987, 245), (1988, 248), (1989, 250), (1990, 253),
-    (1991, 255), (1992, 258), (1993, 260), (1994, 263), (1995, 265),
-    (1996, 268), (1997, 270), (1998, 273), (1999, 275), (2000, 278),
-    (2001, 280), (2002, 283), (2003, 285), (2004, 288), (2005, 290),
-    (2006, 293), (2007, 295), (2008, 298), (2009, 300), (2010, 303),
-    (2011, 305), (2012, 308), (2013, 310), (2014, 313)
+    {"_id":"66f1bbd38100500e633d99c9","year":1963,"average_duration":157239.8},{"_id":"66f1bbd38100500e633d99ca","year":1964,"average_duration":172514.3},{"_id":"66f1bbd38100500e633d99cb","year":1965,"average_duration":170336},{"_id":"66f1bbd38100500e633d99cc","year":1966,"average_duration":182482.3},{"_id":"66f1bbd38100500e633d99cd","year":1967,"average_duration":245279.7},{"_id":"66f1bbd38100500e633d99ce","year":1968,"average_duration":251236.6},{"_id":"66f1bbd38100500e633d99cf","year":1969,"average_duration":255317},{"_id":"66f1bbd38100500e633d99d0","year":1970,"average_duration":233782.2},{"_id":"66f1bbd38100500e633d99d1","year":1971,"average_duration":212061.1},{"_id":"66f1bbd38100500e633d99d2","year":1972,"average_duration":200605},{"_id":"66f1bbd38100500e633d99d3","year":1973,"average_duration":153263.2},{"_id":"66f1bbd38100500e633d99d4","year":1974,"average_duration":265547.7}
 ]
 
 # Convert data to lists
-years = [row[0] for row in data]
-durations = [row[1] for row in data]
+years = [row["year"] for row in data]
+durations = [row["average_duration"]/60000 for row in data]     #divide by 60000 to convert ms into s
 
 # Create the plot (the diagram)
 plt.figure(figsize=(10, 6))
 plt.plot(years, durations, marker='o')
 plt.title('Average Song Duration by Year')
 plt.xlabel('Year')
-plt.ylabel('Average Duration (seconds)')
+plt.ylabel('Average Duration (minutes)')
 plt.grid(True)
 
 # Show the plot (Zeppelin will automatically render it)
